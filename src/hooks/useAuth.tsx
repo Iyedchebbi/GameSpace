@@ -15,6 +15,7 @@ interface AuthContextType {
   resendVerificationEmail: (email: string) => Promise<{ error: string | null }>;
   updateProfile: (name: string, avatarUrl?: string) => Promise<{ error: string | null }>;
   uploadAvatar: (file: File) => Promise<{ error: string | null; avatarUrl?: string }>;
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -47,11 +48,36 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkAndSetUser = async () => {
     let sessionUser = null;
+    let googleAvatarUrl = null;
     
     try {
       const { data } = await insforge.auth.getCurrentSession();
       if (data?.session?.user) {
         sessionUser = data.session.user;
+        
+        // Try to get Google avatar from the user object
+        const userWithMetadata = sessionUser as unknown as {
+          profile?: { avatar_url?: string; name?: string };
+          metadata?: Record<string, unknown>;
+          providers?: string[];
+        };
+        
+        // First check profile
+        googleAvatarUrl = userWithMetadata.profile?.avatar_url;
+        
+        // Then check user_oauth_providers view for Google avatar
+        if (!googleAvatarUrl) {
+          const { data: providerData } = await insforge.database
+            .from('user_oauth_providers')
+            .select('avatar_url, avatar_url2')
+            .eq('user_id', sessionUser.id)
+            .eq('provider', 'google')
+            .maybeSingle();
+          
+          if (providerData) {
+            googleAvatarUrl = providerData.avatar_url || providerData.avatar_url2;
+          }
+        }
       }
     } catch (err) {
       // Silent fail - will use localStorage fallback
@@ -60,10 +86,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       if (sessionUser) {
         let dbUser = await fetchUserFromDb(sessionUser.id);
+        
         if (!dbUser) {
-          await createUserInDb(sessionUser.id, sessionUser.email || '', sessionUser.profile?.name || '');
+          // Create new user with Google avatar if available
+          await createUserInDb(
+            sessionUser.id, 
+            sessionUser.email || '', 
+            sessionUser.profile?.name || '',
+            googleAvatarUrl || undefined
+          );
           dbUser = await fetchUserFromDb(sessionUser.id);
+        } else if (!dbUser.avatar_url && googleAvatarUrl) {
+          // Update existing user with Google avatar if they don't have one
+          await insforge.database
+            .from('users')
+            .update({ avatar_url: googleAvatarUrl })
+            .eq('id', sessionUser.id);
+          
+          dbUser = { ...dbUser, avatar_url: googleAvatarUrl };
         }
+        
         if (dbUser) {
           localStorage.setItem('gamingzone_user', JSON.stringify(dbUser));
         }
@@ -229,6 +271,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return { error: error?.message || null };
   };
 
+  const refreshUserData = async () => {
+    await checkAndSetUser();
+  };
+
   const uploadAvatar = async (file: File): Promise<{ error: string | null; avatarUrl?: string }> => {
     if (!user) {
       return { error: 'Not authenticated' };
@@ -299,6 +345,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       resendVerificationEmail,
       updateProfile,
       uploadAvatar,
+      refreshUserData,
     }}>
       {children}
     </AuthContext.Provider>

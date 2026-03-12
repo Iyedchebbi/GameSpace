@@ -12,14 +12,8 @@ interface InsForgeUser {
     name?: string;
     avatar_url?: string;
   };
-  identities?: Array<{
-    provider: string;
-    identity_data?: {
-      avatar_url?: string;
-      picture?: string;
-    };
-  }>;
   metadata?: Record<string, unknown>;
+  providers?: string[];
 }
 
 export default function AuthCallback() {
@@ -42,12 +36,20 @@ export default function AuthCallback() {
         if (data?.session?.user) {
           const user = data.session.user as unknown as InsForgeUser;
           
-          // Get Google avatar from provider data
+          // Try to get Google avatar from user_oauth_providers view
           let googleAvatarUrl = user.profile?.avatar_url;
           
           if (!googleAvatarUrl) {
-            const providerData = user.identities?.find((id) => id.provider === 'google');
-            googleAvatarUrl = providerData?.identity_data?.avatar_url || providerData?.identity_data?.picture;
+            const { data: providerData } = await insforge.database
+              .from('user_oauth_providers')
+              .select('avatar_url, avatar_url2')
+              .eq('user_id', user.id)
+              .eq('provider', 'google')
+              .maybeSingle();
+            
+            if (providerData) {
+              googleAvatarUrl = providerData.avatar_url || providerData.avatar_url2;
+            }
           }
           
           // Check if user exists in database
@@ -86,6 +88,8 @@ export default function AuthCallback() {
 
           setStatus('success');
           setMessage('Account verified successfully!');
+          
+          // Small delay before redirect to ensure everything is saved
           setTimeout(() => router.push('/'), 1500);
         } else {
           setStatus('error');
