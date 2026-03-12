@@ -5,6 +5,23 @@ import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
 import { insforge } from '@/lib/insforge';
 
+interface InsForgeUser {
+  id: string;
+  email: string | null;
+  profile?: {
+    name?: string;
+    avatar_url?: string;
+  };
+  identities?: Array<{
+    provider: string;
+    identity_data?: {
+      avatar_url?: string;
+      picture?: string;
+    };
+  }>;
+  metadata?: Record<string, unknown>;
+}
+
 export default function AuthCallback() {
   const router = useRouter();
   const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
@@ -22,7 +39,51 @@ export default function AuthCallback() {
           return;
         }
 
-        if (data?.session) {
+        if (data?.session?.user) {
+          const user = data.session.user as unknown as InsForgeUser;
+          
+          // Get Google avatar from provider data
+          let googleAvatarUrl = user.profile?.avatar_url;
+          
+          if (!googleAvatarUrl) {
+            const providerData = user.identities?.find((id) => id.provider === 'google');
+            googleAvatarUrl = providerData?.identity_data?.avatar_url || providerData?.identity_data?.picture;
+          }
+          
+          // Check if user exists in database
+          const { data: existingUser } = await insforge.database
+            .from('users')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+
+          if (existingUser) {
+            // Update with Google avatar if no avatar exists
+            if (!existingUser.avatar_url && googleAvatarUrl) {
+              await insforge.database
+                .from('users')
+                .update({ avatar_url: googleAvatarUrl })
+                .eq('id', user.id);
+              
+              // Update localStorage with new avatar
+              const updatedUser = { ...existingUser, avatar_url: googleAvatarUrl };
+              localStorage.setItem('gamingzone_user', JSON.stringify(updatedUser));
+            }
+          } else {
+            // Create new user with Google avatar
+            const newUser = {
+              id: user.id,
+              email: user.email || '',
+              name: user.profile?.name || user.email?.split('@')[0] || 'User',
+              password_hash: 'managed_by_google',
+              avatar_url: googleAvatarUrl || null,
+            };
+            await insforge.database.from('users').insert([newUser]);
+            
+            // Save to localStorage
+            localStorage.setItem('gamingzone_user', JSON.stringify(newUser));
+          }
+
           setStatus('success');
           setMessage('Account verified successfully!');
           setTimeout(() => router.push('/'), 1500);
