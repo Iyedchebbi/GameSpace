@@ -4,12 +4,15 @@ import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Link from 'next/link';
 import emailjs from '@emailjs/browser';
+import { useAuth } from '@/hooks/useAuth';
 import { insforge } from '@/lib/insforge';
-import { Order } from '@/types';
+import { Order, User } from '@/types';
 
 const EMAILJS_SERVICE_ID = 'service_5xji29m';
 const EMAILJS_TEMPLATE_ID = 'template_order_update';
 const EMAILJS_PUBLIC_KEY = 'M0PmnIQHCsMjdF3kX';
+
+const ADMIN_EMAILS = ['admin-space@gmail.com', 'iyedchebbi18@gmail.com', 'adminadmin@gmail.com', 'miladicode1379@gmail.com'];
 
 const statusColors: Record<string, string> = {
   pending: 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30',
@@ -22,12 +25,31 @@ const statusColors: Record<string, string> = {
 const statuses = ['pending', 'confirmed', 'shipped', 'delivered', 'cancelled'];
 
 export default function AdminOrdersPage() {
+  const { user: authUser, loading: authLoading } = useAuth();
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [deleteOrder, setDeleteOrder] = useState<Order | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [adminUser, setAdminUser] = useState<User | null>(null);
+
+  const isAdmin = adminUser && ADMIN_EMAILS.includes(adminUser.email?.toLowerCase());
+  const isAuthAdmin = authUser && ADMIN_EMAILS.includes(authUser.email?.toLowerCase());
+
+  useEffect(() => {
+    const storedAdmin = sessionStorage.getItem('adminUser');
+    if (storedAdmin) {
+      try {
+        const adminData = JSON.parse(storedAdmin);
+        if (ADMIN_EMAILS.includes(adminData.email?.toLowerCase())) {
+          setAdminUser(adminData);
+        }
+      } catch (e) {
+        console.error('Failed to parse admin user');
+      }
+    }
+  }, []);
 
   const fetchOrders = async () => {
     let query = insforge.database
@@ -43,6 +65,8 @@ export default function AdminOrdersPage() {
 
     if (!error && data) {
       setOrders(data);
+    } else if (error) {
+      console.error('Error fetching orders:', error.message);
     }
     setLoading(false);
   };
@@ -53,7 +77,17 @@ export default function AdminOrdersPage() {
 
   const handleStatusChange = async (orderId: string, newStatus: string, order?: Order) => {
     setUpdatingId(orderId);
-    await insforge.database.from('orders').update({ status: newStatus }).eq('id', orderId);
+    
+    const { error: updateError } = await insforge.database
+      .from('orders')
+      .update({ status: newStatus })
+      .eq('id', orderId);
+
+    if (updateError) {
+      console.error('Error updating order:', updateError.message);
+      setUpdatingId(null);
+      return;
+    }
 
     if (order?.email && order.fullname && order.product_name) {
       try {

@@ -54,13 +54,43 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
       return;
     }
 
-    // First try InsForge auth
+    // Try InsForge auth first
     const { error: loginError } = await signIn(email, password);
     
     if (!loginError) {
-      // InsForge login successful - let it handle session
+      // InsForge login successful
       setLoggingIn(false);
       return;
+    }
+    
+    // If password auth fails, try to get session from auth - user might have signed in with Google
+    try {
+      const { data: sessionData } = await import('@/lib/insforge').then(m => 
+        m.insforge.auth.getCurrentSession()
+      );
+      
+      if (sessionData?.session?.user) {
+        // User is authenticated via OAuth (e.g., Google)
+        const { insforge } = await import('@/lib/insforge');
+        const { data: adminData } = await insforge.database
+          .from('users')
+          .select('*')
+          .eq('email', email.toLowerCase())
+          .single();
+
+        if (adminData || ADMIN_EMAILS.includes(email.toLowerCase())) {
+          sessionStorage.setItem('adminUser', JSON.stringify({
+            id: sessionData.session.user.id,
+            email: email.toLowerCase(),
+            name: sessionData.session.user.profile?.name || 'Admin'
+          }));
+          setLoggingIn(false);
+          window.location.href = '/admin';
+          return;
+        }
+      }
+    } catch (sessionErr) {
+      console.log('No active session');
     }
     
     // If InsForge auth fails, check for hardcoded admin credentials
