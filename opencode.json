@@ -1,0 +1,17 @@
+{
+  "$schema": "https://opencode.ai/config.json",
+  "mcp": {
+    "insforge": {
+      "type": "local",
+      "command": [
+        "npx",
+        "-y",
+        "@insforge/mcp@latest"
+      ],
+      "environment": {
+        "API_KEY": "ik_adee788be64c6bc5dfbed2d4cc8539ae",
+        "API_BASE_URL": "https://m3pm4j3c.eu-central.insforge.app"
+      }
+    }
+  }
+}
