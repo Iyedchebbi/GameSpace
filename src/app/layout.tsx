@@ -5,6 +5,9 @@ import './globals.css';
 export const metadata: Metadata = {
   title: 'GAMEZONE - Level Up Your Game',
   description: 'Your ultimate destination for premium gaming gear. Level up your experience with cutting-edge equipment.',
+  icons: {
+    icon: [{ url: '/favicon.svg' }],
+  },
 };
 
 export default function RootLayout({
