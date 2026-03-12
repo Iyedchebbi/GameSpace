@@ -18,6 +18,7 @@ export default function Header() {
   const { isOpen: showCartModal, openCartModal, closeCartModal } = useCartModal();
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [showProfileModal, setShowProfileModal] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -61,6 +62,19 @@ export default function Header() {
                   </Link>
                 ))}
               </nav>
+
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="md:hidden p-2 text-gray-300 hover:text-cyan-400 transition-colors"
+              >
+                <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  {mobileMenuOpen ? (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  ) : (
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                  )}
+                </svg>
+              </button>
 
               <div className="flex items-center space-x-4">
                 <button onClick={openCartModal} className="relative p-2 text-gray-300 hover:text-cyan-400 transition-colors">
@@ -127,6 +141,40 @@ export default function Header() {
             </div>
           </div>
         </div>
+
+        <AnimatePresence>
+          {mobileMenuOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="md:hidden glass-nav border-t border-gray-800"
+            >
+              <div className="px-4 py-4 space-y-3">
+                {['Home', 'Store', 'Deals', 'About'].map((item) => (
+                  <Link
+                    key={item}
+                    href={item === 'Home' ? '/' : `/${item.toLowerCase()}`}
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="block text-gray-300 hover:text-cyan-400 transition-colors font-medium py-2"
+                  >
+                    {item}
+                  </Link>
+                ))}
+                {!loading && !user && (
+                  <div className="flex gap-3 pt-2">
+                    <button onClick={() => { setMobileMenuOpen(false); openSignIn(); }} className="flex-1 py-2 text-sm font-medium text-gray-300 hover:text-white transition-colors border border-gray-700 rounded-lg">
+                      Sign In
+                    </button>
+                    <button onClick={() => { setMobileMenuOpen(false); openSignUp(); }} className="flex-1 py-2 text-sm font-medium bg-gradient-to-r from-cyan-500 to-pink-500 text-black rounded-lg">
+                      Sign Up
+                    </button>
+                  </div>
+                )}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       <AnimatePresence>

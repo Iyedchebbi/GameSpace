@@ -155,7 +155,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
 
   return (
     <motion.div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center sm:p-4 p-3"
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
@@ -163,7 +163,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
       <div className="absolute inset-0 bg-black/80 backdrop-blur-md" onClick={onClose} />
 
       <motion.div
-        className="relative w-full max-w-md p-8 rounded-3xl bg-gray-900/90 border border-cyan-500/30 glow-border shadow-2xl"
+        className="relative w-full max-w-md sm:p-8 p-5 rounded-3xl bg-gray-900/90 border border-cyan-500/30 glow-border shadow-2xl"
         initial={{ scale: 0.9, opacity: 0, y: 20 }}
         animate={{ scale: 1, opacity: 1, y: 0 }}
         exit={{ scale: 0.9, opacity: 0, y: 20 }}
@@ -186,22 +186,22 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 20 }}
             >
-              <div className="text-center mb-8">
+              <div className="text-center sm:mb-8 mb-6">
                 <motion.div
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-pink-500/20 border border-cyan-500/30 mb-4"
+                  className="inline-flex items-center justify-center sm:w-16 sm:h-16 w-14 h-14 rounded-2xl bg-gradient-to-br from-cyan-500/20 to-pink-500/20 border border-cyan-500/30 sm:mb-4 mb-3"
                   animate={{ scale: [1, 1.05, 1] }}
                   transition={{ duration: 2, repeat: Infinity }}
                 >
-                  <svg className="w-8 h-8 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="sm:w-8 sm:h-8 w-7 h-7 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
                   </svg>
                 </motion.div>
-                <h2 className="text-3xl font-bold">
+                <h2 className="sm:text-3xl text-2xl font-bold">
                   <span className="text-gradient">
                     {mode === 'signin' ? 'Welcome Back' : 'Join GAMEZONE'}
                   </span>
                 </h2>
-                <p className="text-gray-400 mt-2">
+                <p className="text-gray-400 sm:mt-2 mt-1.5 sm:text-base text-sm">
                   {mode === 'signin' 
                     ? 'Sign in to access your account' 
                     : 'Create your account to get started'}
@@ -211,7 +211,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
               <motion.button
                 onClick={handleGoogleSignIn}
                 disabled={loading}
-                className="w-full flex items-center justify-center gap-3 py-3 px-4 bg-white/10 hover:bg-white/20 border border-gray-700 rounded-xl transition-all mb-6"
+                className="w-full flex items-center justify-center gap-3 sm:py-3 py-2.5 sm:px-4 px-3 bg-white/10 hover:bg-white/20 border border-gray-700 rounded-xl transition-all sm:mb-6 mb-4"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -224,7 +224,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                 <span className="font-medium">Continue with Google</span>
               </motion.button>
 
-              <div className="relative mb-6">
+              <div className="relative sm:mb-6 mb-4">
                 <div className="absolute inset-0 flex items-center">
                   <div className="w-full border-t border-gray-700"></div>
                 </div>
@@ -233,19 +233,19 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                 </div>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-4">
+              <form onSubmit={handleSubmit} className="sm:space-y-4 space-y-3">
                 {mode === 'signup' && (
                   <div>
-                    <label className="block text-sm font-medium text-gray-300 mb-2">Full Name</label>
+                    <label className="block text-sm font-medium text-gray-300 sm:mb-2 mb-1.5">Full Name</label>
                     <div className="relative">
-                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg className="absolute left-4 top-1/2 -translate-y-1/2 sm:w-5 sm:h-5 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                       </svg>
                       <input
                         type="text"
                         value={name}
                         onChange={(e) => setName(e.target.value)}
-                        className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white placeholder-gray-500 transition-all"
+                        className="w-full sm:pl-12 pl-10 sm:pr-4 pr-3 sm:py-3 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white placeholder-gray-500 transition-all sm:text-base text-sm"
                         placeholder="Enter your name"
                         required
                       />
@@ -254,16 +254,16 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                 )}
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Email Address</label>
+                  <label className="block text-sm font-medium text-gray-300 sm:mb-2 mb-1.5">Email Address</label>
                   <div className="relative">
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 sm:w-5 sm:h-5 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <input
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white placeholder-gray-500 transition-all"
+                      className="w-full sm:pl-12 pl-10 sm:pr-4 pr-3 sm:py-3 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white placeholder-gray-500 transition-all sm:text-base text-sm"
                       placeholder="Enter your email"
                       required
                     />
@@ -271,16 +271,16 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-300 mb-2">Password</label>
+                  <label className="block text-sm font-medium text-gray-300 sm:mb-2 mb-1.5">Password</label>
                   <div className="relative">
-                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="absolute left-4 top-1/2 -translate-y-1/2 sm:w-5 sm:h-5 w-4 h-4 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                     </svg>
                     <input
                       type="password"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full pl-12 pr-4 py-3 bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white placeholder-gray-500 transition-all"
+                      className="w-full sm:pl-12 pl-10 sm:pr-4 pr-3 sm:py-3 py-2.5 bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white placeholder-gray-500 transition-all sm:text-base text-sm"
                       placeholder="Enter your password"
                       required
                       minLength={6}
@@ -304,7 +304,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                 <motion.button
                   type="submit"
                   disabled={loading}
-                  className="w-full py-4 bg-gradient-to-r from-cyan-500 to-pink-500 text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 shadow-lg"
+                  className="w-full sm:py-4 py-3 bg-gradient-to-r from-cyan-500 to-pink-500 text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 shadow-lg sm:text-lg text-base"
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                 >
@@ -320,7 +320,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                 </motion.button>
               </form>
 
-              <p className="mt-6 text-center text-gray-400">
+              <p className="sm:mt-6 mt-4 text-center text-gray-400 sm:text-base text-sm">
                 {mode === 'signin' ? "Don't have an account? " : 'Already have an account? '}
                 <button
                   onClick={() => handleModeChange(mode === 'signin' ? 'signup' : 'signin')}
@@ -337,28 +337,28 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -20 }}
             >
-              <div className="text-center mb-8">
+              <div className="text-center sm:mb-8 mb-6">
                 <motion.div
-                  className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-green-500/20 to-cyan-500/20 border border-green-500/30 mb-4"
+                  className="inline-flex items-center justify-center sm:w-16 sm:h-16 w-14 h-14 rounded-2xl bg-gradient-to-br from-green-500/20 to-cyan-500/20 border border-green-500/30 sm:mb-4 mb-3"
                   animate={{ scale: [1, 1.1, 1] }}
                   transition={{ duration: 1.5, repeat: Infinity }}
                 >
-                  <svg className="w-8 h-8 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg className="sm:w-8 sm:h-8 w-7 h-7 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                   </svg>
                 </motion.div>
-                <h2 className="text-3xl font-bold">
+                <h2 className="sm:text-3xl text-2xl font-bold">
                   <span className="text-gradient">Verify Email</span>
                 </h2>
-                <p className="text-gray-400 mt-2">
+                <p className="text-gray-400 sm:mt-2 mt-1.5 sm:text-base text-sm">
                   We sent a 6-digit code to<br />
                   <span className="text-cyan-400">{email}</span>
                 </p>
               </div>
 
-              <div className="mb-6">
-                <label className="block text-sm font-medium text-gray-300 mb-4 text-center">Enter verification code</label>
-                <div className="flex justify-center gap-2" onPaste={handlePaste}>
+              <div className="sm:mb-6 mb-4">
+                <label className="block text-sm font-medium text-gray-300 sm:mb-4 mb-3 text-center">Enter verification code</label>
+                <div className="flex justify-center gap-1.5 sm:gap-2" onPaste={handlePaste}>
                   {verificationCode.map((digit, index) => (
                     <input
                       key={index}
@@ -369,7 +369,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
                       value={digit}
                       onChange={(e) => handleCodeChange(index, e.target.value)}
                       onKeyDown={(e) => handleKeyDown(index, e)}
-                      className="w-12 h-14 text-center text-xl font-bold bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white transition-all"
+                      className="sm:w-12 w-10 sm:h-14 h-12 text-center sm:text-xl text-lg font-bold bg-gray-800/50 border border-gray-700 rounded-xl focus:border-cyan-500 focus:ring-1 focus:ring-cyan-500 text-white transition-all"
                     />
                   ))}
                 </div>
@@ -391,7 +391,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
               <motion.button
                 onClick={handleVerify}
                 disabled={loading || verificationCode.join('').length !== 6}
-                className="w-full py-4 bg-gradient-to-r from-green-500 to-cyan-500 text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 shadow-lg mb-4"
+                className="w-full sm:py-4 py-3 bg-gradient-to-r from-green-500 to-cyan-500 text-black font-bold rounded-xl hover:opacity-90 transition-all disabled:opacity-50 shadow-lg sm:mb-4 mb-3 sm:text-lg text-base"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
               >
@@ -399,7 +399,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
               </motion.button>
 
               <div className="text-center">
-                <p className="text-gray-400 text-sm mb-2">Didn't receive the code?</p>
+                <p className="text-gray-400 text-sm sm:mb-2 mb-1.5">Didn't receive the code?</p>
                 <button
                   onClick={handleResendCode}
                   disabled={countdown > 0}
@@ -411,7 +411,7 @@ export default function AuthModal({ mode, onModeChange, onClose }: AuthModalProp
 
               <button
                 onClick={() => setStep('form')}
-                className="w-full mt-6 py-2 text-gray-400 hover:text-white transition-colors text-sm"
+                className="w-full sm:mt-6 mt-4 sm:py-2 py-1.5 text-gray-400 hover:text-white transition-colors sm:text-base text-sm"
               >
                 &larr; Back to sign up
               </button>
